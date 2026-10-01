@@ -1,0 +1,184 @@
+:root {
+  /* Built-in stylesheet, used when a project provides none.
+     Change the values in this block. The rules below use them. */
+
+  /* Page. Word's Normal margins are 2.54cm. */
+  --margin-top: 2.5cm;
+  --margin-right: 2.5cm;
+  --margin-bottom: 2.5cm;
+  --margin-left: 2.5cm;
+
+  /* Page numbers at the bottom right: none, or for example
+     counter(page) " / " counter(pages). Off by default: CV parsers (ATS) read them as text. */
+  --page-numbers: none;
+
+  /* Type. Sizes are pt. --line is a multiple, like Word's line spacing. */
+  --font: "Liberation Serif", "Noto Serif", "Times New Roman", serif;
+  --font-heading: "Liberation Sans", "Noto Sans", Arial, sans-serif;
+  --font-mono: "Liberation Mono", "Noto Sans Mono", "Courier New", monospace;
+  --size: 11pt;
+  --size-title: 22pt;
+  --size-section: 14pt;
+  --size-subsection: 12pt;
+  --size-h4: 11pt;
+  --size-small: 9pt;
+  --line: 1.15;
+
+  /* Space after a paragraph, and space around a heading. */
+  --space-paragraph: 8pt;
+  --space-before-heading: 14pt;
+  --space-after-heading: 4pt;
+
+  --color: #1d1d1f;
+  --color-muted: #5c6370;
+  --color-accent: #1f4e79;
+  --color-rule: #d0d0d5;
+  --color-code-bg: #f4f4f6;
+}
+
+@page {
+  size: A4;
+  margin: var(--margin-top) var(--margin-right) var(--margin-bottom) var(--margin-left);
+
+  @bottom-right {
+    color: var(--color-muted);
+    content: var(--page-numbers);
+    font-family: var(--font);
+    font-size: var(--size-small);
+  }
+}
+
+html {
+  color: var(--color);
+  font-family: var(--font);
+  font-size: var(--size);
+  line-height: var(--line);
+}
+
+body {
+  margin: 0;
+}
+
+/* Screen preview: one A4 sheet with the same margins as the page. */
+@media screen {
+  html {
+    background: #d9d9d9;
+  }
+
+  body {
+    background: white;
+    box-sizing: border-box;
+    margin: 1rem auto;
+    min-height: 297mm;
+    padding: var(--margin-top) var(--margin-right) var(--margin-bottom) var(--margin-left);
+    width: 210mm;
+  }
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+h1,
+h2,
+h3,
+h4 {
+  break-after: avoid;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: var(--space-before-heading) 0 var(--space-after-heading);
+}
+
+h1 {
+  font-size: var(--size-title);
+  font-weight: 600;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: var(--size-section);
+}
+
+h3 {
+  font-size: var(--size-subsection);
+}
+
+h4 {
+  font-size: var(--size-h4);
+}
+
+p,
+ul,
+ol,
+blockquote,
+table,
+pre {
+  margin: 0 0 var(--space-paragraph);
+}
+
+ul,
+ol {
+  padding-left: 18pt;
+}
+
+li {
+  margin: 0 0 2pt;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+img {
+  max-width: 100%;
+}
+
+table {
+  border-collapse: collapse;
+  break-inside: avoid;
+  width: 100%;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--color-rule);
+  padding: 3pt 6pt;
+  text-align: left;
+}
+
+th {
+  border-bottom-width: 2px;
+}
+
+code,
+pre {
+  font-family: var(--font-mono);
+  font-size: var(--size-small);
+}
+
+pre {
+  background: var(--color-code-bg);
+  break-inside: avoid;
+  padding: 8pt 10pt;
+  white-space: pre-wrap;
+}
+
+blockquote {
+  border-left: 3px solid var(--color-rule);
+  color: var(--color-muted);
+  padding-left: 10pt;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--color-rule);
+  margin: var(--space-before-heading) 0;
+}
+
+.footnotes {
+  font-size: var(--size-small);
+}

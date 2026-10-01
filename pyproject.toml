@@ -1,0 +1,35 @@
+[project]
+name = "ginja"
+version = "0.1.0"
+description = "Programmable Markdown/Jinja document engine: Markdown, HTML, Jinja2, TOML and CSS to HTML and PDF"
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "João Machado de Freitas" }]
+dependencies = [
+    "jinja2>=3.1",
+    "markdown-it-py>=3.0",
+    "mdit-py-plugins>=0.4",
+    "weasyprint>=62",
+]
+
+[project.scripts]
+ginja = "ginja.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff"]
+
+[build-system]
+requires = ["uv_build<0.13"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+# Python only: ruff would otherwise also reformat code blocks in Markdown files.
+extend-exclude = ["*.md", "examples/*/build"]
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

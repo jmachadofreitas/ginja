@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="{{ build.locale or document.language }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ document.title }}</title>
+{% if document.author is defined %}
+<meta name="author" content="{{ document.author }}">
+{% endif %}
+{% for css in styles %}
+<style>
+{{ css }}
+</style>
+{% endfor %}
+</head>
+<body>
+{{ content }}
+</body>
+</html>
