@@ -1,0 +1,11 @@
+{% from "macros/cv.html.j2" import entry_header %}
+## {{ locale.education }} { #education }
+
+{% for degree in data.education %}
+{{ entry_header(degree.degree, degree.institution, degree | period) }}
+
+{% if degree.thesis is defined %}
+{{ degree.thesis }}
+
+{% endif %}
+{% endfor %}

@@ -1,0 +1,9 @@
+{% from "macros/cv.html.j2" import entry_header %}
+## {{ locale.projects }} { #projects }
+
+{% for project in data.projects %}
+{{ entry_header(project.title, period=project.year) }}
+
+{{ project.description }}
+
+{% endfor %}

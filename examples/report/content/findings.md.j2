@@ -1,0 +1,18 @@
+## Findings
+
+The availability target is **{{ data.metrics.target | percent }}**.
+
+| Service | Availability | Incidents | Target met |
+|---|--:|--:|:-:|
+{% for service in data.metrics.services %}
+| {{ service.name }} | {{ service.availability | percent }} | {{ service.incidents }} | {{ "yes" if service.meets_target else "**no**" }} |
+{% endfor %}
+
+{% if data.metrics.missed %}
+{{ data.metrics.missed | length }} service(s) missed the target:
+{{ data.metrics.missed | map(attribute="name") | join(", ") }}.
+{% else %}
+Every service met the target.
+{% endif %}
+
+{% include "content/fragments/method-note.md" %}

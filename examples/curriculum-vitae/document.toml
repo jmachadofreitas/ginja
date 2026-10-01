@@ -1,0 +1,11 @@
+title = "Jane Example — Curriculum Vitae"
+author = "Jane Example"
+language = "en"
+
+template = "cv"
+style = "cv.css"
+output = "cv"
+
+# Defaults; override with --profile and --locale.
+profile = "data-science"
+locale = "en"

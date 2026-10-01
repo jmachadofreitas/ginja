@@ -1,0 +1,24 @@
+{#
+  Entry header: title and subtitle on the left, period and place on the right.
+
+  The output must not contain blank lines: in Markdown, an HTML block ends at the first
+  blank line, and the rest would be parsed as Markdown.
+#}
+{% macro entry_header(title, subtitle=none, period=none, place=none, current=false) %}
+<div class="entry-header{{ ' current' if current else '' }}">
+  <div class="entry-main">
+    <span class="entry-title">{{ title }}</span>
+    {% if subtitle %}
+    <span class="entry-subtitle">{{ subtitle }}</span>
+    {% endif %}
+  </div>
+  <div class="entry-meta">
+    {% if period %}
+    <span class="entry-period">{{ period }}</span>
+    {% endif %}
+    {% if place %}
+    <span class="entry-place">{{ place }}</span>
+    {% endif %}
+  </div>
+</div>
+{% endmacro %}

@@ -1,0 +1,86 @@
+@page {
+  size: A4;
+  margin: 2.4cm 2.2cm 2.6cm;
+
+  @bottom-left {
+    color: #6b6b73;
+    content: string(report-title);
+    font-size: 8.5pt;
+  }
+
+  @bottom-right {
+    color: #6b6b73;
+    content: "Page " counter(page) " of " counter(pages);
+    font-size: 8.5pt;
+  }
+}
+
+html {
+  color: #1d1d1f;
+  font-family: "Noto Sans", "DejaVu Sans", Helvetica, Arial, sans-serif;
+  font-size: 10.5pt;
+  line-height: 1.5;
+}
+
+body {
+  margin: 2.5rem auto;
+  max-width: 44rem;
+  padding: 0 1rem;
+}
+
+@media print {
+  body {
+    margin: 0;
+    max-width: none;
+    padding: 0;
+  }
+}
+
+h1 {
+  color: #14406f;
+  font-size: 22pt;
+  margin: 0 0 0.2em;
+  string-set: report-title content();
+}
+
+h1 + p {
+  color: #6b6b73;
+  margin-top: 0;
+}
+
+h2 {
+  border-bottom: 1px solid #c9d3df;
+  break-after: avoid;
+  color: #14406f;
+  font-size: 13pt;
+  margin-top: 1.8em;
+  padding-bottom: 0.2em;
+}
+
+table {
+  border-collapse: collapse;
+  break-inside: avoid;
+  margin: 1em 0;
+  width: 100%;
+}
+
+th, td {
+  border-bottom: 1px solid #dde2e8;
+  padding: 0.35em 0.6em;
+}
+
+th {
+  background: #eef2f7;
+  text-align: left;
+}
+
+.note {
+  background: #f6f7f9;
+  border-left: 3px solid #14406f;
+  margin: 1.2em 0;
+  padding: 0.6em 0.9em;
+}
+
+.footnotes {
+  font-size: 0.85em;
+}

@@ -1,0 +1,5 @@
+## {{ locale.skills }} { #skills }
+
+{% for group in data.skills %}
+- **{{ group.name }}:** {{ group.items | join(", ") }}
+{% endfor %}

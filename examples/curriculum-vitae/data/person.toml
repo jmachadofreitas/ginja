@@ -1,0 +1,13 @@
+name = "Jane Example"
+email = "jane@example.com"
+phone = "+49 30 1234 5678"
+location.en = "Berlin, Germany"
+location.de = "Berlin"
+
+[[links]]
+label = "github.com/jane-example"
+url = "https://github.com/jane-example"
+
+[[links]]
+label = "linkedin.com/in/jane-example"
+url = "https://www.linkedin.com/in/jane-example"

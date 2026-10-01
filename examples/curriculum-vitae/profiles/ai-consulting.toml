@@ -1,0 +1,23 @@
+# Keys here are interpreted by this project's extensions/document.py, not by the engine.
+
+title.en = "AI Consultant"
+title.de = "KI-Beraterin"
+
+summary.en = """
+AI consultant who combines hands-on data-science delivery with strategy work. I help
+organisations find the AI use cases worth funding and get the first ones into production.
+"""
+summary.de = """
+KI-Beraterin, die praktische Data-Science-Umsetzung mit Strategiearbeit verbindet. Ich helfe
+Unternehmen, die lohnenden KI-Use-Cases zu finden und die ersten davon in Produktion zu bringen.
+"""
+
+include_tags = ["ai-consulting", "client-work", "strategy"]
+experience = ["consulting-company", "example-company"]
+projects = ["genai-strategy", "ml-platform"]
+sections = ["summary", "experience", "projects", "skills", "education"]
+
+# Overrides for the `document` namespace.
+[document]
+title.en = "Jane Example — AI Consultant"
+title.de = "Jane Example — KI-Beraterin"

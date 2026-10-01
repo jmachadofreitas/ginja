@@ -1,0 +1,49 @@
+# Skills are kept when they have no tags or share a tag with the profile's `include_tags`.
+
+[[groups]]
+name.en = "Programming"
+name.de = "Programmierung"
+items = [
+    { name = "Python", tags = ["python", "data-science", "machine-learning", "data-analytics", "ai-consulting"] },
+    { name = "SQL", tags = ["sql", "data-analytics", "data-science"] },
+    { name = "R", tags = ["statistics", "data-analytics"] },
+]
+
+[[groups]]
+name.en = "Methods"
+name.de = "Methoden"
+items = [
+    { name = { en = "Time-series forecasting", de = "Zeitreihenprognose" }, tags = ["data-science", "machine-learning"] },
+    { name = { en = "Recommender systems", de = "Empfehlungssysteme" }, tags = ["machine-learning"] },
+    { name = { en = "Bayesian statistics", de = "Bayessche Statistik" }, tags = ["statistics", "data-science"] },
+    { name = { en = "A/B testing", de = "A/B-Tests" }, tags = ["statistics", "data-analytics"] },
+    { name = { en = "LLM applications", de = "LLM-Anwendungen" }, tags = ["ai-consulting", "machine-learning"] },
+]
+
+[[groups]]
+name.en = "Tools"
+name.de = "Werkzeuge"
+items = [
+    { name = "scikit-learn", tags = ["machine-learning", "data-science"] },
+    { name = "PyTorch", tags = ["machine-learning"] },
+    { name = "MLflow", tags = ["machine-learning"] },
+    { name = "dbt", tags = ["data-analytics", "sql"] },
+    { name = "Power BI", tags = ["dashboards", "data-analytics"] },
+]
+
+[[groups]]
+name.en = "Consulting"
+name.de = "Beratung"
+items = [
+    { name = { en = "Use-case prioritisation", de = "Use-Case-Priorisierung" }, tags = ["ai-consulting", "strategy"] },
+    { name = { en = "Business cases", de = "Business Cases" }, tags = ["strategy", "ai-consulting"] },
+    { name = { en = "Workshop facilitation", de = "Workshop-Moderation" }, tags = ["client-work"] },
+]
+
+[[groups]]
+name.en = "Languages"
+name.de = "Sprachen"
+items = [
+    { name = { en = "English (native)", de = "Englisch (Muttersprache)" } },
+    { name = { en = "German (C1)", de = "Deutsch (C1)" } },
+]

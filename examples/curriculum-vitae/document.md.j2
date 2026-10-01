@@ -1,0 +1,6 @@
+{#- The profile decides which sections appear and in what order. Each content file starts
+    with `## Heading { #id }`, so the section's id is the section name in every language. -#}
+{% for section in profile.sections %}
+{% include "content/" ~ section ~ ".md.j2" %}
+
+{% endfor %}

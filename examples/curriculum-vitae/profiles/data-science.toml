@@ -1,0 +1,24 @@
+# Keys here are interpreted by this project's extensions/document.py, not by the engine.
+
+title = "Data Scientist"
+
+summary.en = """
+Data scientist with seven years of experience turning messy operational data into
+forecasting and recommendation systems that run in production. Strong in Python,
+probabilistic modelling and MLOps, and used to working directly with business stakeholders.
+"""
+summary.de = """
+Data Scientist mit sieben Jahren Erfahrung darin, unübersichtliche Betriebsdaten in
+produktive Prognose- und Empfehlungssysteme zu verwandeln. Stark in Python, probabilistischer
+Modellierung und MLOps; gewohnt, direkt mit Fachbereichen zusammenzuarbeiten.
+"""
+
+include_tags = ["data-science", "machine-learning", "python", "statistics"]
+experience = ["consulting-company", "example-company", "research-lab"]
+projects = ["forecasting-platform", "recommendation-system"]
+sections = ["summary", "experience", "projects", "skills", "education"]
+
+# Overrides for the `document` namespace.
+[document]
+title.en = "Jane Example — Data Scientist"
+title.de = "Jane Example — Data Scientist"

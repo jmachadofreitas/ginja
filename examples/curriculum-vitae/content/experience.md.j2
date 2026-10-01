@@ -1,0 +1,11 @@
+{% from "macros/cv.html.j2" import entry_header %}
+## {{ locale.experience }} { #experience }
+
+{% for job in data.experience %}
+{{ entry_header(job.role, job.company, job | period, job.location, current=job is ongoing) }}
+
+{% for highlight in job.highlights %}
+- {{ highlight }}
+{% endfor %}
+
+{% endfor %}

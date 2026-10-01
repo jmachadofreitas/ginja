@@ -1,0 +1,24 @@
+# Keys here are interpreted by this project's extensions/document.py, not by the engine.
+
+title.en = "Data Analyst"
+title.de = "Datenanalystin"
+
+summary.en = """
+Data analyst with a statistics background who builds reliable data models, clear dashboards
+and analyses that lead to decisions.
+"""
+summary.de = """
+Datenanalystin mit Statistik-Hintergrund, die verlässliche Datenmodelle, klare Dashboards und
+entscheidungsrelevante Analysen erstellt.
+"""
+
+include_tags = ["data-analytics", "sql", "dashboards", "statistics"]
+experience = ["consulting-company", "example-company", "retail-company"]
+projects = ["churn-analysis", "sales-dashboard"]
+# Skills come before experience in this variant.
+sections = ["summary", "skills", "experience", "projects", "education"]
+
+# Overrides for the `document` namespace.
+[document]
+title.en = "Jane Example — Data Analyst"
+title.de = "Jane Example — Datenanalystin"

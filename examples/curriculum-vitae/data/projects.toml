@@ -1,0 +1,87 @@
+[[projects]]
+id = "forecasting-platform"
+year = 2023
+title.en = "Demand Forecasting Platform"
+title.de = "Plattform zur Nachfrageprognose"
+description.en = """
+Hierarchical forecasting service for 40,000 products, with automated backtesting and a
+planner-facing explanation of every forecast.
+"""
+description.de = """
+Hierarchischer Prognosedienst für 40.000 Produkte mit automatisiertem Backtesting und einer
+für Disponenten verständlichen Erklärung jeder Prognose.
+"""
+tags = ["data-science", "analytics"]
+
+[[projects]]
+id = "recommendation-system"
+year = 2024
+title.en = "Product Recommendation System"
+title.de = "Produktempfehlungssystem"
+description.en = """
+Two-stage retrieval and ranking model for an online shop; raised click-through on
+recommendations by 9 % in an A/B test.
+"""
+description.de = """
+Zweistufiges Retrieval- und Ranking-Modell für einen Onlineshop; steigerte die Klickrate auf
+Empfehlungen im A/B-Test um 9 %.
+"""
+tags = ["data-science", "machine-learning"]
+
+[[projects]]
+id = "genai-strategy"
+year = 2025
+title.en = "Generative-AI Strategy for a Manufacturer"
+title.de = "Strategie für generative KI bei einem Industrieunternehmen"
+description.en = """
+Assessed 30 candidate use cases, built business cases for the top five and set up the
+governance for the first two pilots.
+"""
+description.de = """
+Bewertung von 30 möglichen Use Cases, Business Cases für die fünf wichtigsten und Aufbau der
+Governance für die ersten beiden Piloten.
+"""
+tags = ["ai-consulting", "strategy"]
+
+[[projects]]
+id = "ml-platform"
+year = 2024
+title.en = "Machine-Learning Platform Blueprint"
+title.de = "Blaupause für eine Machine-Learning-Plattform"
+description.en = """
+Target architecture and rollout plan for model training, serving and monitoring across four
+business units.
+"""
+description.de = """
+Zielarchitektur und Einführungsplan für Training, Bereitstellung und Monitoring von Modellen
+in vier Geschäftsbereichen.
+"""
+tags = ["ai-consulting", "machine-learning"]
+
+[[projects]]
+id = "sales-dashboard"
+year = 2016
+title.en = "Store Performance Dashboard"
+title.de = "Dashboard zur Filialperformance"
+description.en = """
+Self-service dashboard on a curated SQL model, replacing 40 spreadsheet reports.
+"""
+description.de = """
+Self-Service-Dashboard auf einem kuratierten SQL-Modell, das 40 Tabellenberichte ersetzte.
+"""
+tags = ["data-analytics", "dashboards"]
+
+[[projects]]
+id = "churn-analysis"
+year = 2022
+title.en = "Customer Churn Analysis"
+title.de = "Analyse der Kundenabwanderung"
+description.en = """
+Survival analysis of subscription churn that identified the three onboarding steps with the
+largest effect on retention.
+"""
+description.de = """
+Überlebenszeitanalyse der Abo-Kündigungen, die die drei Onboarding-Schritte mit dem größten
+Einfluss auf die Kundenbindung identifizierte.
+"""
+tags = ["data-analytics", "statistics"]

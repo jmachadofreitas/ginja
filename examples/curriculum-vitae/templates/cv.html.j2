@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="{{ build.locale or document.language }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ document.title }}</title>
+<meta name="author" content="{{ data.person.name }}">
+{% for css in styles %}
+<style>
+{{ css }}
+</style>
+{% endfor %}
+</head>
+<body>
+<header class="cv-header">
+  <h1>{{ data.person.name }}</h1>
+  <p class="headline">{{ profile.title }}</p>
+  <ul class="contact">
+    <li>{{ data.person.location }}</li>
+    <li><a href="mailto:{{ data.person.email }}">{{ data.person.email }}</a></li>
+    <li>{{ data.person.phone }}</li>
+    {% for link in data.person.links %}
+    <li><a href="{{ link.url }}">{{ link.label }}</a></li>
+    {% endfor %}
+  </ul>
+</header>
+<main>
+{{ content }}
+</main>
+</body>
+</html>

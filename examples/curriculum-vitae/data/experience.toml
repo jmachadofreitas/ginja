@@ -1,0 +1,115 @@
+# Canonical experience. Profiles select jobs by `id`; highlights are kept when they have
+# no tags or share a tag with the profile's `include_tags`.
+
+[[jobs]]
+id = "consulting-company"
+company = "Northwind Consulting"
+role.en = "AI Consultant"
+role.de = "KI-Beraterin"
+location.en = "Berlin, Germany"
+location.de = "Berlin"
+start = "2025-07"
+tags = ["ai-consulting", "client-work", "strategy"]
+
+[[jobs.highlights]]
+text.en = "Advise mid-sized manufacturers on generative-AI use cases, from opportunity assessment to a costed delivery roadmap."
+text.de = "Beratung mittelständischer Industrieunternehmen zu generativer KI – von der Potenzialanalyse bis zur kalkulierten Umsetzungs-Roadmap."
+tags = ["ai-consulting", "strategy"]
+
+[[jobs.highlights]]
+text.en = "Lead workshops with business and IT stakeholders to rank use cases by value and feasibility."
+text.de = "Leitung von Workshops mit Fach- und IT-Verantwortlichen, um Use Cases nach Nutzen und Machbarkeit zu priorisieren."
+tags = ["client-work", "ai-consulting"]
+
+[[jobs.highlights]]
+text.en = "Build proof-of-concept models in Python that validate the most promising use cases within four weeks."
+text.de = "Entwicklung von Proof-of-Concept-Modellen in Python, die die vielversprechendsten Use Cases innerhalb von vier Wochen validieren."
+tags = ["data-science", "machine-learning", "python"]
+
+[[jobs.highlights]]
+text.en = "Define KPI frameworks and dashboards that track the business impact of deployed AI solutions."
+text.de = "Definition von KPI-Systemen und Dashboards, die den Geschäftsnutzen eingeführter KI-Lösungen messen."
+tags = ["data-analytics", "dashboards"]
+
+[[jobs]]
+id = "example-company"
+company = "Example Company"
+role.en = "Senior Data Scientist"
+role.de = "Senior Data Scientist"
+location.en = "Berlin, Germany"
+location.de = "Berlin"
+start = "2022-01"
+end = "2025-06"
+tags = ["data-science", "ai-consulting", "python", "client-work"]
+
+[[jobs.highlights]]
+text.en = "Designed and implemented a demand-forecasting platform that cut forecast error by **18 %** across 40,000 products."
+text.de = "Konzeption und Entwicklung einer Plattform zur Nachfrageprognose, die den Prognosefehler über 40.000 Produkte um **18 %** senkte."
+tags = ["data-science", "machine-learning", "python"]
+
+[[jobs.highlights]]
+text.en = "Took models to production with automated retraining, monitoring and drift alerts."
+text.de = "Überführung der Modelle in den Produktivbetrieb mit automatisiertem Retraining, Monitoring und Drift-Warnungen."
+tags = ["machine-learning", "python"]
+
+[[jobs.highlights]]
+text.en = "Presented results to client executives and turned them into operational decisions."
+text.de = "Präsentation der Ergebnisse vor Führungskräften der Kunden und Übersetzung in operative Entscheidungen."
+tags = ["client-work", "ai-consulting"]
+
+[[jobs.highlights]]
+text.en = "Built the SQL data model and self-service dashboards used by 120 demand planners."
+text.de = "Aufbau des SQL-Datenmodells und der Self-Service-Dashboards für 120 Disponentinnen und Disponenten."
+tags = ["data-analytics", "sql", "dashboards"]
+
+[[jobs.highlights]]
+text.en = "Mentored three junior data scientists and shaped the team's machine-learning roadmap."
+text.de = "Betreuung von drei Junior Data Scientists und Mitgestaltung der Machine-Learning-Roadmap des Teams."
+tags = ["data-science", "strategy"]
+
+[[jobs]]
+id = "research-lab"
+company = "Example Research Lab"
+role.en = "Research Scientist"
+role.de = "Wissenschaftliche Mitarbeiterin"
+location.en = "Potsdam, Germany"
+location.de = "Potsdam"
+start = "2019-03"
+end = "2021-12"
+tags = ["data-science", "machine-learning", "statistics"]
+
+[[jobs.highlights]]
+text.en = "Developed probabilistic models for industrial sensor time series, published in two peer-reviewed venues."
+text.de = "Entwicklung probabilistischer Modelle für industrielle Sensor-Zeitreihen, veröffentlicht in zwei begutachteten Fachkonferenzen."
+tags = ["machine-learning", "statistics"]
+
+[[jobs.highlights]]
+text.en = "Maintained the group's open-source Python toolkit for reproducible experiments."
+text.de = "Pflege des quelloffenen Python-Toolkits der Arbeitsgruppe für reproduzierbare Experimente."
+tags = ["python", "data-science"]
+
+[[jobs]]
+id = "retail-company"
+company = "Contoso Retail"
+role.en = "Data Analyst"
+role.de = "Datenanalystin"
+location.en = "Hamburg, Germany"
+location.de = "Hamburg"
+start = "2014-10"
+end = "2016-09"
+tags = ["data-analytics", "sql", "dashboards"]
+
+[[jobs.highlights]]
+text.en = "Automated weekly sales reporting with SQL and Python, saving two analyst days per week."
+text.de = "Automatisierung des wöchentlichen Vertriebsreportings mit SQL und Python, was zwei Analystentage pro Woche einsparte."
+tags = ["sql", "data-analytics"]
+
+[[jobs.highlights]]
+text.en = "Designed store-performance dashboards for 300 regional managers."
+text.de = "Gestaltung von Dashboards zur Filialperformance für 300 Regionalleitungen."
+tags = ["dashboards", "data-analytics"]
+
+[[jobs.highlights]]
+text.en = "Ran A/B tests for pricing and promotion campaigns."
+text.de = "Durchführung von A/B-Tests für Preis- und Aktionskampagnen."
+tags = ["statistics"]
