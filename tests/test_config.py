@@ -159,3 +159,24 @@ def test_front_matter_feeds_the_document_namespace(render_html):
     assert "<title>Example</title>" in html
     assert "<h1>Example</h1>" in html
     assert "+++" not in html
+
+
+def test_data_setting_renames_folder_and_namespace(render_html):
+    html = render_html(
+        {
+            "document.md.j2": "{{ facts.person.name }}\n",
+            "document.toml": 'data = "facts"\n',
+            "facts/person.toml": "name = 'Jane Example'\n",
+            "data/ignored.toml": "x = \n",  # not loaded: the folder is facts/
+        }
+    )
+    assert "Jane Example" in html
+
+
+@pytest.mark.parametrize("name", ["profile", "build", "my-facts", "", 3])
+def test_data_setting_rejects_reserved_or_invalid_names(make_project, name):
+    root = make_project({"document.md": "x"})
+    with pytest.raises(DocumentError) as caught:
+        context_of(root, overrides={"data": name})
+    assert caught.value.stage == "configuration"
+    assert "data must be a folder name" in caught.value.message

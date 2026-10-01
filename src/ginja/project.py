@@ -1,5 +1,5 @@
 """The project model: entry discovery, TOML loading, configuration precedence and the
-rendering context (`document`, `profile`, `locale`, `data` and `build`)."""
+rendering context (`document`, `profile`, `locale`, the data namespace and `build`)."""
 
 import re
 import tomllib
@@ -13,8 +13,13 @@ ENTRY_NAMES = ("document.md.j2", "document.md", "document.html.j2", "document.ht
 KINDS = (".md.j2", ".md", ".html.j2", ".html")
 
 # Built-in defaults: the bottom of the configuration precedence chain. `title` and `output`
-# default to the entry's stem and are added per project.
-DEFAULTS = {"language": "en", "template": "default"}
+# default to the entry's stem and are added per project. `data` names the folder of TOML data
+# files and their namespace in templates: `data = "facts"` loads facts/*.toml as `facts.*`.
+DEFAULTS = {"language": "en", "template": "default", "data": "data"}
+
+# Names a data namespace cannot take: the other context names and the outer template's.
+RESERVED_NAMES = {"document", "profile", "locale", "build", "content", "styles"}
+IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 
 FRONT_MATTER = re.compile(
     r"\A\+\+\+[ \t]*\r?\n(.*?)^\+\+\+[ \t]*(?:\r?\n|\Z)", re.DOTALL | re.MULTILINE
@@ -126,12 +131,12 @@ def load_named(project: Project, folder: str, label: str, name: object) -> dict:
     return load_toml(path, f"{folder}/{name}.toml")
 
 
-def load_data(project: Project) -> dict:
-    """Load every `data/*.toml` file as `data.<stem>`."""
+def load_data(project: Project, name: str = "data") -> dict:
+    """Load every `<name>/*.toml` file as `<name>.<stem>`."""
 
-    folder = project.root / "data"
+    folder = project.root / name
     return {
-        path.stem: load_toml(path, f"data/{path.name}") for path in sorted(folder.glob("*.toml"))
+        path.stem: load_toml(path, f"{name}/{path.name}") for path in sorted(folder.glob("*.toml"))
     }
 
 
@@ -149,6 +154,10 @@ def _check(document: dict, source: str) -> None:
             fail(f"style must be a stylesheet name or a list of names, got {style!r}")
     if not (isinstance(document["output"], str) and document["output"]):
         fail(f"output must be a non-empty file name, got {document['output']!r}")
+    data = document["data"]
+    if not (isinstance(data, str) and IDENTIFIER.fullmatch(data)) or data in RESERVED_NAMES:
+        reserved = ", ".join(sorted(RESERVED_NAMES))
+        fail(f"data must be a folder name usable in templates (not {reserved}), got {data!r}")
 
 
 def load_context(
@@ -162,7 +171,8 @@ def load_context(
 
     `document` follows the precedence chain: built-in defaults < document.toml < the profile's
     `[document]` table < front matter < overrides (`--set`, `--profile`, `--locale`).
-    `profile`, `locale` and `data` stay separate namespaces.
+    `profile`, `locale` and the data namespace (`data`, or the name `document.data` sets)
+    stay separate.
     """
 
     overrides = dict(overrides or {})
@@ -202,6 +212,6 @@ def load_context(
         "document": document,
         "profile": profile_values,
         "locale": locale_values,
-        "data": load_data(project),
+        document["data"]: load_data(project, document["data"]),
         "build": {"entry": project.entry.name, "profile": profile_name, "locale": locale_name},
     }
