@@ -1,0 +1,14 @@
+target: 99.5
+services:
+  - name: Checkout
+    availability: 99.93
+    incidents: 1
+  - name: Search
+    availability: 99.41
+    incidents: 4
+  - name: Accounts
+    availability: 99.78
+    incidents: 2
+  - name: Notifications
+    availability: 99.12
+    incidents: 6

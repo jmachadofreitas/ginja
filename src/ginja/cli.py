@@ -68,8 +68,8 @@ def _parser() -> argparse.ArgumentParser:
 def _variant_options(command: argparse.ArgumentParser) -> None:
     """Options shared by `build` and `preview`."""
 
-    command.add_argument("--profile", help="build variant from profiles/<PROFILE>.toml")
-    command.add_argument("--locale", help="language values from locales/<LOCALE>.toml")
+    command.add_argument("--profile", help="build variant from profiles/<PROFILE> (TOML or YAML)")
+    command.add_argument("--locale", help="language values from locales/<LOCALE> (TOML or YAML)")
     command.add_argument(
         "--set",
         dest="overrides",

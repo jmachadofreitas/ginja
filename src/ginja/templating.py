@@ -53,7 +53,7 @@ class ProjectLoader(jinja2.FileSystemLoader):
 
 
 def markdown_filter(text: str, inline: bool = False) -> Markup:
-    """Render a Markdown string to HTML, e.g. a TOML description inside an HTML template."""
+    """Render a Markdown string to HTML, e.g. a description from a data file."""
 
     return Markup(markdown.render_inline(text) if inline else markdown.render(text))
 

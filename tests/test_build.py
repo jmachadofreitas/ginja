@@ -48,8 +48,16 @@ def test_style_list_may_extend_the_built_in_default(render_html):
 
 def test_missing_stylesheet_fails(make_project):
     root = make_project({"document.md": "x", "document.toml": "style = 'nope.css'\n"})
-    with pytest.raises(DocumentError, match="stylesheet 'nope.css' not found"):
+    with pytest.raises(DocumentError, match="stylesheet 'nope.css' not found") as caught:
         build(root, formats=["html"])
+    assert caught.value.path == "document.toml"
+
+
+def test_missing_stylesheet_names_the_yaml_config(make_project):
+    root = make_project({"document.md": "x", "document.yaml": "style: nope.css\n"})
+    with pytest.raises(DocumentError, match="stylesheet 'nope.css' not found") as caught:
+        build(root, formats=["html"])
+    assert caught.value.path == "document.yaml"
 
 
 def test_project_template_receives_content_and_context(render_html):

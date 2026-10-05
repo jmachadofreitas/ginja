@@ -11,16 +11,17 @@ just example-cv-all                     # all six variants
 ## How it is put together
 
 ```text
-canonical data (data/*.toml)
+canonical data (data/*.toml and data/*.yaml)
   → profile selection (profiles/<role>.toml)
   → locale resolution (field.en / field.de, locales/<code>.toml)
   → CV-specific filtering and ordering (extensions/document.py)
   → generic engine: Jinja → Markdown → HTML → PDF
 ```
 
-- **`data/`** holds the canonical CV. Jobs and projects have stable `id`s. Highlights, skills
-  and projects carry `tags`. Text that needs a deliberate translation is written in both
-  languages, for example `role.en` and `role.de`.
+- **`data/`** holds the canonical CV. Jobs and education are YAML. Skills, projects and the
+  contact card are TOML. Jobs and projects have stable `id`s. Highlights, skills and
+  projects carry `tags`. Text that needs a deliberate translation is written in both
+  languages, for example `en` and `de` under `role`.
 - **`profiles/`** pick the jobs and projects to show, by id, and list `include_tags` to filter
   highlights and skills. `sections` sets the section order. The `[document]` table overrides
   the document title. The engine doesn't interpret any of these keys; the extension does.

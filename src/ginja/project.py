@@ -1,10 +1,13 @@
-"""The project model: entry discovery, TOML loading, configuration precedence and the
-rendering context (`document`, `profile`, `locale`, the data namespace and `build`)."""
+"""The project model: entry discovery, TOML and YAML loading, configuration precedence and
+the rendering context (`document`, `profile`, `locale`, the data namespace and `build`)."""
 
 import re
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
+
+import yaml
+from yaml.nodes import MappingNode
 
 from .errors import DocumentError
 
@@ -13,18 +16,91 @@ ENTRY_NAMES = ("document.md.j2", "document.md", "document.html.j2", "document.ht
 KINDS = (".md.j2", ".md", ".html.j2", ".html")
 
 # Built-in defaults: the bottom of the configuration precedence chain. `title` and `output`
-# default to the entry's stem and are added per project. `data` names the folder of TOML data
-# files and their namespace in templates: `data = "facts"` loads facts/*.toml as `facts.*`.
+# default to the entry's stem and are added per project. `data` names the folder of data
+# files and their namespace in templates: `data = "facts"` loads facts/*.{toml,yaml,yml}
+# as `facts.*`.
 DEFAULTS = {"language": "en", "template": "default", "data": "data"}
+
+# Project files may be written in either format. New files use `.yaml`; `.yml` is accepted.
+STRUCTURED_SUFFIXES = (".toml", ".yaml", ".yml")
 
 # Names a data namespace cannot take: the other context names and the outer template's.
 RESERVED_NAMES = {"document", "profile", "locale", "build", "content", "styles"}
 IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 
-FRONT_MATTER = re.compile(
+TOML_FRONT_MATTER = re.compile(
     r"\A\+\+\+[ \t]*\r?\n(.*?)^\+\+\+[ \t]*(?:\r?\n|\Z)", re.DOTALL | re.MULTILINE
 )
+YAML_FRONT_MATTER = re.compile(
+    r"\A---[ \t]*\r?\n(.*?)^---[ \t]*(?:\r?\n|\Z)", re.DOTALL | re.MULTILINE
+)
 TOML_LINE = re.compile(r"at line (\d+)")
+
+# PyYAML follows YAML 1.1: `yes`/`no`/`on`/`off` are booleans and `2024-01-01` is a date.
+# Document values are mostly strings, so only `true`/`false` are booleans and dates stay text.
+_BOOL_TAG = "tag:yaml.org,2002:bool"
+_TIMESTAMP_TAG = "tag:yaml.org,2002:timestamp"
+_BOOL_PATTERN = re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$")
+
+
+def _document_resolvers() -> dict:
+    resolvers = {}
+    for first, entries in yaml.SafeLoader.yaml_implicit_resolvers.items():
+        kept = []
+        for tag, pattern in entries:
+            if tag == _TIMESTAMP_TAG:
+                continue
+            if tag == _BOOL_TAG:
+                pattern = _BOOL_PATTERN
+            kept.append((tag, pattern))
+        if kept:
+            resolvers[first] = kept
+    return resolvers
+
+
+class _DocumentLoader(yaml.SafeLoader):
+    """Safe YAML loader with string keys and TOML-like scalars and duplicate keys."""
+
+    yaml_implicit_resolvers = _document_resolvers()
+
+    def construct_mapping(self, node, deep=False):
+        if isinstance(node, MappingNode):
+            self.flatten_mapping(node)
+        if not isinstance(node, MappingNode):
+            raise yaml.constructor.ConstructorError(
+                None, None, f"expected a mapping node, but found {node.id}", node.start_mark
+            )
+        mapping = {}
+        for key_node, value_node in node.value:
+            key = _string_key(self.construct_object(key_node, deep=deep), key_node)
+            if key in mapping:
+                raise yaml.constructor.ConstructorError(
+                    "while constructing a mapping",
+                    node.start_mark,
+                    f"found duplicate key {key!r}",
+                    key_node.start_mark,
+                )
+            mapping[key] = self.construct_object(value_node, deep=deep)
+        return mapping
+
+
+def _string_key(key, key_node):
+    """YAML keys become strings, matching TOML. A boolean key becomes true or false."""
+
+    if isinstance(key, str):
+        return key
+    if isinstance(key, bool):
+        return "true" if key else "false"
+    if isinstance(key, int):
+        return str(key)
+    if isinstance(key, float):
+        return str(key)
+    raise yaml.constructor.ConstructorError(
+        "while constructing a mapping",
+        key_node.start_mark,
+        f"mapping key must be a string, got {type(key).__name__}",
+        key_node.start_mark,
+    )
 
 
 @dataclass
@@ -88,20 +164,63 @@ def load_toml(path: Path, label: str) -> dict:
         raise _toml_error(error, label) from None
 
 
-def split_front_matter(text: str, label: str) -> tuple[dict, str]:
-    """Split TOML front matter (`+++` fences) from a source text.
+def _yaml_error(error: yaml.YAMLError, label: str, offset: int = 0) -> DocumentError:
+    mark = getattr(error, "problem_mark", None)
+    line = mark.line + 1 + offset if mark is not None and mark.line is not None else None
+    return DocumentError("YAML loading", str(error), label, line)
 
-    The front matter is replaced by as many blank lines as it occupied, so line numbers in
-    later error messages still match the file.
+
+def _load_yaml(text: str, label: str, offset: int = 0) -> dict:
+    try:
+        value = yaml.load(text, Loader=_DocumentLoader)
+    except yaml.YAMLError as error:
+        raise _yaml_error(error, label, offset) from None
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise DocumentError("YAML loading", "the file must be a mapping", label)
+    return value
+
+
+def load_yaml(path: Path, label: str) -> dict:
+    """Load a YAML file; `label` is the project-relative path used in error messages."""
+
+    return _load_yaml(read_text(path), label)
+
+
+def load_structured(path: Path, label: str) -> dict:
+    """Load a TOML or YAML file."""
+
+    if path.suffix.lower() == ".toml":
+        return load_toml(path, label)
+    return load_yaml(path, label)
+
+
+def split_front_matter(text: str, label: str) -> tuple[dict, str]:
+    """Split front matter from a source text.
+
+    `+++` fences are TOML and `---` fences are YAML. The front matter is replaced by as many
+    blank lines as it occupied, so line numbers in later error messages still match the file.
     """
 
-    match = FRONT_MATTER.match(text)
-    if match is None:
-        return {}, text
+    toml_match = TOML_FRONT_MATTER.match(text)
+    if toml_match is not None:
+        return _parsed_front_matter(toml_match, text, label, _load_toml_text)
+    yaml_match = YAML_FRONT_MATTER.match(text)
+    if yaml_match is not None:
+        return _parsed_front_matter(yaml_match, text, label, _load_yaml)
+    return {}, text
+
+
+def _load_toml_text(text: str, label: str, offset: int = 0) -> dict:
     try:
-        values = tomllib.loads(match.group(1))
+        return tomllib.loads(text)
     except tomllib.TOMLDecodeError as error:
-        raise _toml_error(error, label, offset=1) from None
+        raise _toml_error(error, label, offset) from None
+
+
+def _parsed_front_matter(match: re.Match, text: str, label: str, load) -> tuple[dict, str]:
+    values = load(match.group(1), label, offset=1)
     return values, "\n" * match.group(0).count("\n") + text[match.end() :]
 
 
@@ -118,26 +237,89 @@ def merge(*layers: dict) -> dict:
     return merged
 
 
-def load_named(project: Project, folder: str, label: str, name: object) -> dict:
-    """Load `profiles/<name>.toml` or `locales/<name>.toml`."""
+def _and(items: list[str]) -> str:
+    if len(items) == 2:
+        return f"{items[0]} and {items[1]}"
+    return ", ".join(items[:-1]) + f" and {items[-1]}"
+
+
+def _files_named(folder: Path, name: str) -> list[Path]:
+    return [
+        path for suffix in STRUCTURED_SUFFIXES if (path := folder / f"{name}{suffix}").is_file()
+    ]
+
+
+def _structured_files(folder: Path) -> dict[str, list[Path]]:
+    """Map each stem to its TOML/YAML files. Hidden names are ignored, as `*.toml` was."""
+
+    grouped: dict[str, list[Path]] = {}
+    if not folder.is_dir():
+        return grouped
+    for path in sorted(folder.iterdir()):
+        if path.name.startswith(".") or not path.is_file():
+            continue
+        if path.suffix.lower() not in STRUCTURED_SUFFIXES:
+            continue
+        grouped.setdefault(path.stem, []).append(path)
+    return grouped
+
+
+def _reject_duplicates(paths: list[Path], labels: list[str], stem: str, source: str) -> Path:
+    if len(paths) == 1:
+        return paths[0]
+    raise DocumentError("configuration", f"{_and(labels)} define {stem!r}", source)
+
+
+def document_config(root: Path) -> Path | None:
+    """The `document.toml`, `document.yaml` or `document.yml` file, if the project has one."""
+
+    matches = _files_named(root, "document")
+    if len(matches) > 1:
+        raise DocumentError(
+            "configuration", f"{_and([path.name for path in matches])} define 'document'"
+        )
+    return matches[0] if matches else None
+
+
+def document_config_label(root: Path) -> str:
+    """Name of the document config file, or `document.toml` when the project has none."""
+
+    path = document_config(root)
+    return path.name if path else "document.toml"
+
+
+def resolve_named(project: Project, folder: str, label: str, name: object) -> Path:
+    """Find `profiles/<name>.toml` or `.yaml` (or the same under `locales/`)."""
 
     if not isinstance(name, str) or not re.fullmatch(r"[\w][\w.-]*", name):
         raise DocumentError("configuration", f"invalid {label} name {name!r}")
-    path = project.root / folder / f"{name}.toml"
-    if not path.is_file():
-        available = ", ".join(sorted(p.stem for p in (project.root / folder).glob("*.toml")))
-        message = f"unknown {label} {name!r}; available: {available or 'none'}"
+    directory = project.root / folder
+    matches = _files_named(directory, name)
+    if not matches:
+        available = ", ".join(sorted(_structured_files(directory))) or "none"
+        message = f"unknown {label} {name!r}; available: {available}"
         raise DocumentError("configuration", message, f"{folder}/")
-    return load_toml(path, f"{folder}/{name}.toml")
+    labels = [f"{folder}/{path.name}" for path in matches]
+    return _reject_duplicates(matches, labels, name, f"{folder}/")
+
+
+def load_named(project: Project, folder: str, label: str, name: object) -> dict:
+    """Load `profiles/<name>.toml` or `.yaml`, or the same under `locales/`."""
+
+    path = resolve_named(project, folder, label, name)
+    return load_structured(path, f"{folder}/{path.name}")
 
 
 def load_data(project: Project, name: str = "data") -> dict:
-    """Load every `<name>/*.toml` file as `<name>.<stem>`."""
+    """Load every `<name>/*.{toml,yaml,yml}` file as `<name>.<stem>`."""
 
     folder = project.root / name
-    return {
-        path.stem: load_toml(path, f"{name}/{path.name}") for path in sorted(folder.glob("*.toml"))
-    }
+    loaded = {}
+    for stem, paths in _structured_files(folder).items():
+        labels = [f"{name}/{path.name}" for path in paths]
+        path = _reject_duplicates(paths, labels, stem, f"{name}/")
+        loaded[stem] = load_structured(path, f"{name}/{path.name}")
+    return loaded
 
 
 def _check(document: dict, source: str) -> None:
@@ -169,10 +351,10 @@ def load_context(
 ) -> dict:
     """Assemble the Jinja context.
 
-    `document` follows the precedence chain: built-in defaults < document.toml < the profile's
-    `[document]` table < front matter < overrides (`--set`, `--profile`, `--locale`).
-    `profile`, `locale` and the data namespace (`data`, or the name `document.data` sets)
-    stay separate.
+    `document` follows the precedence chain: built-in defaults < document.toml or
+    document.yaml < the profile's `[document]` table < front matter < overrides (`--set`,
+    `--profile`, `--locale`). `profile`, `locale` and the data namespace (`data`, or the name
+    `document.data` sets) stay separate.
     """
 
     overrides = dict(overrides or {})
@@ -181,8 +363,9 @@ def load_context(
     if locale is not None:
         overrides["locale"] = locale
 
-    config_path = project.root / "document.toml"
-    config = load_toml(config_path, "document.toml") if config_path.is_file() else {}
+    config_path = document_config(project.root)
+    config_label = document_config_label(project.root)
+    config = load_structured(config_path, config_label) if config_path is not None else {}
     front_matter, _ = split_front_matter(read_text(project.entry), project.entry.name)
 
     # The profile is chosen before its own [document] table can apply.
@@ -190,9 +373,10 @@ def load_context(
     profile_values: dict = {}
     profile_document: dict = {}
     if profile_name is not None:
-        profile_values = load_named(project, "profiles", "profile", profile_name)
+        profile_path = resolve_named(project, "profiles", "profile", profile_name)
+        source = f"profiles/{profile_path.name}"
+        profile_values = load_structured(profile_path, source)
         profile_document = profile_values.pop("document", {})
-        source = f"profiles/{profile_name}.toml"
         if not isinstance(profile_document, dict):
             raise DocumentError("configuration", "[document] must be a table", source)
         if "profile" in profile_document:
@@ -200,7 +384,7 @@ def load_context(
 
     defaults = {"title": project.stem, "output": project.stem, **DEFAULTS}
     document = merge(defaults, config, profile_document, front_matter, overrides)
-    _check(document, "document.toml")
+    _check(document, config_label)
 
     # A profile may choose the default locale, so the locale is resolved last.
     locale_name = document.get("locale")

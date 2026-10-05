@@ -1,5 +1,5 @@
-"""Programmable Markdown/Jinja document engine: Markdown, HTML, Jinja2, TOML and CSS to HTML
-and PDF."""
+"""Programmable Markdown/Jinja document engine: Markdown, HTML, Jinja2, TOML, YAML and CSS to
+HTML and PDF."""
 
 from .build import build
 from .errors import DocumentError

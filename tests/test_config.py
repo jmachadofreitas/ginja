@@ -180,3 +180,141 @@ def test_data_setting_rejects_reserved_or_invalid_names(make_project, name):
         context_of(root, overrides={"data": name})
     assert caught.value.stage == "configuration"
     assert "data must be a folder name" in caught.value.message
+
+
+def test_yaml_document_profile_locale_and_data(make_project):
+    root = make_project(
+        {
+            "document.md": "x",
+            "document.yaml": "title: Doc\nlocale: en\nprofile: short\n",
+            "profiles/short.yaml": "title: Short variant\ninclude_tags: [a]\n",
+            "locales/en.yml": "experience: Experience\n",
+            "data/person.yaml": "name: Jane Example\n",
+        }
+    )
+    context = context_of(root)
+    assert context["document"]["title"] == "Doc"
+    assert context["profile"] == {"title": "Short variant", "include_tags": ["a"]}
+    assert context["locale"] == {"experience": "Experience"}
+    assert context["data"] == {"person": {"name": "Jane Example"}}
+
+
+def test_yaml_front_matter_feeds_the_document_namespace(render_html):
+    html = render_html({"document.md.j2": "---\ntitle: Example\n---\n# {{ document.title }}\n"})
+    assert "<title>Example</title>" in html
+    assert "<h1>Example</h1>" in html
+    assert "---" not in html
+
+
+def test_yaml_scalars_stay_close_to_toml(make_project):
+    root = make_project(
+        {
+            "document.md": "x",
+            "data/values.yaml": """
+                flag: true
+                word: no
+                state: on
+                answer: yes
+                start: 2025-07
+                full: 2024-01-01
+                year: 2023
+            """,
+        }
+    )
+    values = context_of(root)["data"]["values"]
+    assert values["flag"] is True
+    assert values["word"] == "no"
+    assert values["state"] == "on"
+    assert values["answer"] == "yes"
+    assert values["start"] == "2025-07"
+    assert values["full"] == "2024-01-01"
+    assert values["year"] == 2023
+
+
+def test_mixed_toml_and_yaml_data_share_a_namespace(make_project):
+    root = make_project(
+        {
+            "document.md": "x",
+            "data/person.toml": "name = 'Jane Example'\n",
+            "data/notes.yaml": "items:\n  - pen\n",
+            "data/.secret.yaml": "hidden: true\n",
+        }
+    )
+    assert context_of(root)["data"] == {
+        "person": {"name": "Jane Example"},
+        "notes": {"items": ["pen"]},
+    }
+
+
+def test_duplicate_data_stem_names_both_files(make_project):
+    root = make_project(
+        {
+            "document.md": "x",
+            "data/experience.toml": "jobs = []\n",
+            "data/experience.yaml": "jobs: []\n",
+        }
+    )
+    with pytest.raises(
+        DocumentError, match="data/experience.toml and data/experience.yaml define"
+    ) as caught:
+        context_of(root)
+    assert caught.value.stage == "configuration"
+
+
+def test_duplicate_document_config_names_both_files(make_project):
+    root = make_project(
+        {"document.md": "x", "document.toml": "title = 'A'\n", "document.yaml": "title: B\n"}
+    )
+    with pytest.raises(DocumentError, match="document.toml and document.yaml define 'document'"):
+        context_of(root)
+
+
+def test_unknown_profile_lists_toml_and_yaml(make_project):
+    root = make_project({"document.md": "x", "profiles/a.yaml": "", "profiles/b.toml": ""})
+    with pytest.raises(DocumentError, match="unknown profile 'c'; available: a, b"):
+        context_of(root, profile="c")
+
+
+def test_malformed_yaml_names_file_and_line(make_project):
+    root = make_project({"document.md": "x", "data/person.yaml": "name: Jane\n: bad\n"})
+    with pytest.raises(DocumentError) as caught:
+        context_of(root)
+    assert (caught.value.stage, caught.value.path, caught.value.line) == (
+        "YAML loading",
+        "data/person.yaml",
+        2,
+    )
+
+
+def test_malformed_yaml_front_matter_reports_the_file_line(make_project):
+    root = make_project({"document.md": "---\ntitle: ok\n: bad\n---\n"})
+    with pytest.raises(DocumentError) as caught:
+        context_of(root)
+    assert (caught.value.stage, caught.value.path, caught.value.line) == (
+        "YAML loading",
+        "document.md",
+        3,
+    )
+
+
+def test_yaml_root_must_be_a_mapping(make_project):
+    root = make_project({"document.md": "x", "data/person.yaml": "- Jane\n"})
+    with pytest.raises(DocumentError, match="the file must be a mapping") as caught:
+        context_of(root)
+    assert caught.value.stage == "YAML loading"
+
+
+def test_duplicate_yaml_key_names_the_line(make_project):
+    root = make_project({"document.md": "x", "data/person.yaml": "name: Jane\nname: Joan\n"})
+    with pytest.raises(DocumentError, match="duplicate key 'name'") as caught:
+        context_of(root)
+    assert (caught.value.stage, caught.value.path, caught.value.line) == (
+        "YAML loading",
+        "data/person.yaml",
+        2,
+    )
+
+
+def test_empty_yaml_file_is_an_empty_mapping(make_project):
+    root = make_project({"document.md": "x", "data/person.yaml": ""})
+    assert context_of(root)["data"] == {"person": {}}

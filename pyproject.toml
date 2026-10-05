@@ -1,7 +1,7 @@
 [project]
 name = "ginja"
 version = "0.1.0"
-description = "Programmable Markdown/Jinja document engine: Markdown, HTML, Jinja2, TOML and CSS to HTML and PDF"
+description = "Programmable Markdown/Jinja document engine: Markdown, HTML, Jinja2, TOML, YAML and CSS to HTML and PDF"
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "João Machado de Freitas" }]
@@ -9,6 +9,7 @@ dependencies = [
     "jinja2>=3.1",
     "markdown-it-py>=3.0",
     "mdit-py-plugins>=0.4",
+    "pyyaml>=6",
     "weasyprint>=62",
 ]
 

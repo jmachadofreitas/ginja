@@ -17,7 +17,14 @@ from . import markdown
 from .errors import DocumentError, is_template_file, traceback_frames
 from .extensions import apply_setup, apply_transform, load_extension
 from .pdf import write_pdf
-from .project import Project, find_project, load_context, read_text, split_front_matter
+from .project import (
+    Project,
+    document_config_label,
+    find_project,
+    load_context,
+    read_text,
+    split_front_matter,
+)
 from .templating import make_environment
 
 FORMATS = ("html", "pdf")
@@ -134,7 +141,9 @@ def wrap(project: Project, environment: jinja2.Environment, context: dict, fragm
             template = environment.get_template(name)
         except jinja2.TemplateNotFound:
             message = f"template {name!r} not found in templates/ or the built-in templates"
-            raise DocumentError("configuration", message, "document.toml") from None
+            raise DocumentError(
+                "configuration", message, document_config_label(project.root)
+            ) from None
         return template.render(context, content=Markup(fragment), styles=styles)
 
 
@@ -162,7 +171,7 @@ def stylesheets(project: Project, document: dict) -> list[Path]:
             message = (
                 f"stylesheet {name!r} not found in styles/, the project root or the built-in styles"
             )
-            raise DocumentError("configuration", message, "document.toml")
+            raise DocumentError("configuration", message, document_config_label(project.root))
         paths.append(path)
     return paths
 
